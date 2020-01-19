@@ -75,11 +75,15 @@ class Hander(xml.sax.ContentHandler) :
         elif self.istag==5 :
             self.sa['albumartist']=context
         elif self.istag==6 :
-            self.sa['date']=context
+            try :
+                self.sa['date']=int(context)
+            except :
+                if 'date' in self.sa :
+                    self.sa.pop('date')
         elif self.istag==7 :
-            self.sa['discnumber']=context
+            self.sa['discnumber']=int(context)
         elif self.istag==8 :
-            self.sa['tracknumber']=context
+            self.sa['tracknumber']=int(context)
         elif self.istag==9 :
             self.sa['codec']=context
         elif self.istag==10 :
@@ -87,17 +91,17 @@ class Hander(xml.sax.ContentHandler) :
         elif self.istag==11 :
             self.sa['ext']=context
         elif self.istag==12 :
-            self.sa['bitrate']=context
+            self.sa['bitrate']=int(context)
         elif self.istag==13 :
-            self.sa['samplerate']=context
+            self.sa['samplerate']=int(context)
         elif self.istag==14 :
             self.sa['channels']=context
         elif self.istag==15 :
             self.sa['length']=context
         elif self.istag==16 :
-            self.sa['lengthseconds']=context
+            self.sa['lengthseconds']=int(context)
         elif self.istag==17 :
-            self.sa['playcount']=context
+            self.sa['playcount']=int(context)
         elif self.istag==18 :
             self.sa['lastplayed']=context
         elif self.istag==19 :
