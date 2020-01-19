@@ -23,3 +23,4 @@
 <song><title>only my railgun</title><artist>fripSide (フリップサイド)</artist><album>Only My Railgun (とある科学の超电磁炮OP)</album><albumartist>fripSide (フリップサイド)</albumartist><discnumber>1</discnumber><tracknumber>01</tracknumber><codec>FLAC</codec><ext>flac</ext><bitrate>1174</bitrate><samplerate>44100</samplerate><channels>stereo</channels><length>4:17</length><lengthseconds>257</lengthseconds><playcount>3</playcount><lastplayed>2020-01-16 10:35:08</lastplayed><playedtimes>["2020-01-12 16:28:43", "2020-01-13 14:45:26", "2020-01-16 10:35:08"]</playedtimes></song>
 </playlist>
 ```
+[这里](https://kanahanazawa.com/tools/foobarxml/)是一个可以加上根节点的小工具。

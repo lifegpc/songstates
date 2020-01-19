@@ -1,0 +1,9 @@
+#code preferences
+/.vscode
+#input file
+*.xml
+#output file
+*.xls
+*.json
+#runtime file
+*.pyc
