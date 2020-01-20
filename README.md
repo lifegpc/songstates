@@ -33,7 +33,8 @@
 python XMLToJSON.py out.xml out.json
 ```
 #### XMLToXLS
-该程序将XML转换为JSON。可以使用选项"-h"将歌曲历史播放记录专门写入"History"表。
+该程序将XML转换为XLS。可以使用选项"-h"将歌曲历史播放记录专门写入"History"表。   
+**注：现在输入文件也可以是JSON文件**   
 将out.xml转换成out.xls，示例：
 ```bash
 python XMLToJSON.py out.xml out.xls #简单转换

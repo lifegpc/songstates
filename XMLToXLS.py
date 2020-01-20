@@ -4,7 +4,12 @@ import XMLParser
 import json
 import xlwt
 def main(filen:str,filen2:str,settings:dict) :
-    re=XMLParser.loadXML(filen)
+    try :
+        re=XMLParser.loadXML(filen)
+    except :
+        f=open(filen,'r',encoding='utf8')
+        re=json.load(f)
+        f.close()
     if os.path.exists(filen2) :
         os.remove(filen2)
     w=xlwt.Workbook()
