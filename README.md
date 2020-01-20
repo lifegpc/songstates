@@ -24,3 +24,18 @@
 </playlist>
 ```
 [这里](https://kanahanazawa.com/tools/foobarxml/)是一个可以加上根节点的小工具。
+## 程序部分
+### 转换部分
+#### XMLToJSON
+该程序将XML转换成JSON。使用时直接在命令行输入输入文件名和输出文件名即可。   
+例如将out.xml转换为out.json，可以使用下面的命令行
+```bash
+python XMLToJSON.py out.xml out.json
+```
+#### XMLToXLS
+该程序将XML转换为JSON。可以使用选项"-h"将歌曲历史播放记录专门写入"History"表。
+将out.xml转换成out.xls，示例：
+```bash
+python XMLToJSON.py out.xml out.xls #简单转换
+python XMLToJSON.py -h out.xml out.xls #将歌曲历史播放记录写入"History"表，"-h"可以放在任一位置
+```
