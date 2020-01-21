@@ -3,6 +3,7 @@ import os
 import XMLParser
 import json
 import time
+import xlwt
 h="""useage:
 \tanalysis.py [-h] [-a] inputfile outputfile
 choice:
@@ -20,6 +21,12 @@ def main(filen:str,filen2:str,settings:dict) :
         f.close()
     if os.path.exists(filen2) :
         removedir(filen2)
+    os.mkdir(filen2)
+    if 'a' in settings:
+        fn:str="%s\\all.xls"%(filen2)
+        w=xlwt.Workbook(encoding='utf8')
+        t:xlwt.Worksheet=w.add_sheet('每首歌听歌时间')
+        w.save(fn)
 def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
     if len(i)>=1 and i[0]=='-':
@@ -38,9 +45,7 @@ def removedir(f:str) :
         if os.path.isdir(i) :
             removedir(i)
         else:
-            print(i)
             os.remove(i)
-    print(f)
     try :
         os.removedirs(f)
     except :
