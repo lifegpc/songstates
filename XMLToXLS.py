@@ -3,6 +3,7 @@ import os
 import XMLParser
 import json
 import xlwt
+import dataqc
 def main(filen:str,filen2:str,settings:dict) :
     try :
         re=XMLParser.loadXML(filen)
@@ -10,6 +11,8 @@ def main(filen:str,filen2:str,settings:dict) :
         f=open(filen,'r',encoding='utf8')
         re=json.load(f)
         f.close()
+    if 'q' in settings :
+        re=dataqc.qc(re)
     if os.path.exists(filen2) :
         os.remove(filen2)
     w=xlwt.Workbook()
@@ -51,6 +54,9 @@ def getchoice(settings:dict,i:str):
     if len(i)>=1 and i[0]=='-' :
         if i=='-h' :
             settings['h']=True
+            return 2
+        if i=='-q' :
+            settings['q']=True
             return 2
         else :
             return 1

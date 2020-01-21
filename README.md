@@ -28,12 +28,14 @@
 ### 转换部分
 #### XMLToJSON
 该程序将XML转换成JSON。使用时直接在命令行输入输入文件名和输出文件名即可。   
-例如将out.xml转换为out.json，可以使用下面的命令行
+例如将out.xml转换为out.json，可以使用下面的命令行   
+可以使用选项"-q"进行歌曲去重（选项可以放任一位置）
 ```bash
 python XMLToJSON.py out.xml out.json
 ```
 #### XMLToXLS
 该程序将XML转换为XLS。可以使用选项"-h"将歌曲历史播放记录专门写入"History"表。   
+可以使用选项"-q"进行歌曲去重（选项可以放任一位置）   
 **注：现在输入文件也可以是JSON文件**   
 将out.xml转换成out.xls，示例：
 ```bash

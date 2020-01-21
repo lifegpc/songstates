@@ -4,11 +4,13 @@ import XMLParser
 import json
 import time
 import xlwt
+import dataqc
 h="""useage:
-\tanalysis.py [-h] [-a] inputfile outputfile
+\tanalysis.py [-h] [-a] [-q] inputfile outputfile
 choice:
 \t-h\t显示帮助
 \t-a\t分析所有时间的数据
+\t-q\t歌曲去重
 inputfile:支持XML和JSON文件
 outputfile:输出文件夹名称
 """
@@ -19,6 +21,8 @@ def main(filen:str,filen2:str,settings:dict) :
         f=open(filen2,'r',encoding='utf8')
         re=json.load(f)
         f.close()
+    if 'q' in settings :
+        re=dataqc.qc(re)
     if os.path.exists(filen2) :
         removedir(filen2)
     os.mkdir(filen2)
@@ -33,6 +37,8 @@ def getchoice(settings:dict,i:str):
         if i=='-a' :
             settings['a']=True
             return 2
+        if i=='-q' :
+            settings['q']=True
         else :
             return 1
     else:
