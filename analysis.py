@@ -7,7 +7,7 @@ import xlwt
 import dataqc
 import time
 h="""useage:
-\tanalysis.py [-h] [-a] [-q] [-hid] [-p] inputfile outputfile
+\tanalysis.py [-h] <-a> [-q] [-hid] [-p] inputfile outputfile
 choice:
 \t-h\t显示帮助
 \t-a\t分析所有时间的数据
@@ -213,19 +213,48 @@ def main(filen:str,filen2:str,settings:dict) :
                             t.write(k,n,re[j['i']][m])
                         n=n+1
                     k=k+1
+        t:xlwt.Worksheet=w.add_sheet('发行年份播放时间')
+        ti=['序号','年份','播放时间(s)','播放时间','占比']
+        ti3=[0.35,0.4,0.9,1,0.7]
+        if not 'p' in settings :
+            ti=ti[:-1]
+            ti3=ti3[:-1]
+        k=0
+        for i in ti :
+            t.write(0,k,i)
+            rr:xlwt.Column=t.col(k)
+            rr.width=int(rr.width*ti3[k])
+            k=k+1
+        r=getdateplaytimelist(re)
+        sort(r,'date',False)
+        k=1
+        for i in r :
+            t.write(k,0,k)
+            t.write(k,1,i['date'])
+            t.write(k,2,i['playtime'])
+            t.write(k,3,getlengthstr(i['playtime']))
+            if 'p' in settings :
+                t.write(k,4,xlwt.Formula('C%s/SUM(C2:C%s)'%(k+1,len(r)+1)),s)
+            k=k+1
         w.save(fn)
 def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
     if len(i)>=1 and i[0]=='-':
         if i=='-a' :
+            if 'ok' in settings :
+                return -1
             settings['a']=True
+            settings['ok']=True
             return 2
         elif i=='-q' :
             settings['q']=True
+            return 2
         elif i=='-hid' :
             settings['hid']=True
+            return 2
         elif i=='-p' :
             settings['p']=True
+            return 2
         else :
             return 1
     else:
@@ -363,6 +392,24 @@ def geteverydayplaytimelist(l:list,s:bool=False) :
         for i in r:
             sort(d[i['timestr']],'t',False)
     return {'r':r,'d':d}
+def getdateplaytimelist(l:list) :
+    "获取发行年份的播放时间"
+    r=[]
+    def isin(d:dict,r:list):
+        k=0
+        for i in r:
+            if d['date']==i['date'] :
+                return k
+            k=k+1
+        return -1
+    for i in l:
+        if 'date' in i:
+            k=isin(i,r)
+            if k>-1 :
+                r[k]['playtime']=r[k]['playtime']+i['playtime']
+            else :
+                r.append({'date':i['date'],'playtime':i['playtime']})
+    return r
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""
@@ -388,9 +435,16 @@ if __name__=="__main__" :
                 else :
                     print('"%s"文件已存在'%(i))
                     exit(-1)
-        if m==2 :
+            elif read==-1 :
+                print('请检查选项')
+                exit(-1)
+        if m==2 and 'ok' in settings :
             main(name,name2,settings)
         else :
             print('参数不足')
             print(h)
             exit(-1)
+    else :
+        print('需要参数')
+        print(h)
+        exit(-1)
