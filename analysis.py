@@ -33,7 +33,7 @@ def main(filen:str,filen2:str,settings:dict) :
         t:xlwt.Worksheet=w.add_sheet('每首歌听歌时间')
         ti=['排名','播放时间(s)','播放时间','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)','上次播放']
         ti2=['playcount','title','artist','album','trackartist','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds','lastplayed']
-        ti3=[0.35,0.9,0.9,0.7,2.8,2,3.6,1,2,0.4,0.7,0.7,0.5,0.7,0.5,0.5,0.7,0.5,0.5,0.7,1.5]#宽度
+        ti3=[0.35,0.9,1,0.7,2.8,2,3.6,1,2,0.4,0.7,0.7,0.5,0.7,0.5,0.5,0.7,0.5,0.5,0.7,1.5]#宽度
         k=0
         for i in ti:
             t.write(0,k,i)
@@ -57,6 +57,53 @@ def main(filen:str,filen2:str,settings:dict) :
                 if j in i :
                     t.write(k,n,i[j])
                 n=n+1
+            k=k+1
+        t:xlwt.Worksheet=w.add_sheet('艺术家听歌时间')
+        ti=['排名','播放时间(s)','播放时间','艺术家']
+        ti3=[0.35,0.9,1,2]
+        k=0
+        for i in ti :
+            t.write(0,k,i)
+            rr:xlwt.Column=t.col(k)
+            rr.width=int(rr.width*ti3[k])
+            k=k+1
+        r=getartistplaytimelist(re)
+        sort(r,'playtime')
+        k=1
+        tt=0
+        tk=1
+        for i in r :
+            if i['playtime']!=tt :
+                tt=i['playtime']
+                tk=k
+            t.write(k,0,tk)
+            t.write(k,1,i['playtime'])
+            t.write(k,2,getlengthstr(i['playtime']))
+            t.write(k,3,i['artist'])
+            k=k+1
+        t:xlwt.Worksheet=w.add_sheet('专辑听歌时间')
+        ti=['排名','播放时间(s)','播放时间','专辑','专辑艺术家']
+        ti3=[0.35,0.9,1,3.6,2]
+        k=0
+        for i in ti :
+            t.write(0,k,i)
+            rr:xlwt.Column=t.col(k)
+            rr.width=int(rr.width*ti3[k])
+            k=k+1
+        r=getalbumplaytimelist(re)
+        sort(r,'playtime')
+        k=1
+        tt=0
+        tk=1
+        for i in r :
+            if i['playtime']!=tt :
+                tt=i['playtime']
+                tk=k
+            t.write(k,0,tk)
+            t.write(k,1,i['playtime'])
+            t.write(k,2,getlengthstr(i['playtime']))
+            t.write(k,3,i['album'])
+            t.write(k,4,i['albumartist'])
             k=k+1
         w.save(fn)
 def getchoice(settings:dict,i:str):
@@ -114,6 +161,44 @@ def getlengthstr(i:int) :
         return "%.2d:%.2d"%(i//60,i%60)
     else :
         return ""
+def getartistplaytimelist(l:list):
+    "获取艺术家播放时间列表"
+    r=[]
+    def isin(d:dict,r:list) :
+        "判断d是否存在于r"
+        k=0
+        for i in r:
+            if d['artist']==i['artist'] :
+                return k
+            k=k+1
+        return -1
+    for i in l :
+        if 'artist' in i :
+            k=isin(i,r)
+            if k >-1:
+                r[k]['playtime']=r[k]['playtime']+i['playtime']
+            else :
+                r.append({'artist':i['artist'],'playtime':i['playtime']})
+    return r
+def getalbumplaytimelist(l:list) :
+    "获取专辑播放时间列表"
+    r=[]
+    def isin(d:dict,r:list) :
+        "判断d是否存在于r"
+        k=0
+        for i in r:
+            if d['album']==i['album'] and d['albumartist']==i['albumartist'] :
+                return k
+            k=k+1
+        return -1
+    for i in l :
+        if 'album' in i :
+            k=isin(i,r)
+            if k >-1:
+                r[k]['playtime']=r[k]['playtime']+i['playtime']
+            else :
+                r.append({'album':i['album'],'playtime':i['playtime'],'albumartist':i['albumartist']})
+    return r
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""
