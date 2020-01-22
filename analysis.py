@@ -71,8 +71,11 @@ def main(filen:str,filen2:str,settings:dict) :
                 n=n+1
             k=k+1
         t:xlwt.Worksheet=w.add_sheet('艺术家听歌时间')
-        ti=['排名','播放时间(s)','播放时间','艺术家']
-        ti3=[0.35,0.9,1,2]
+        ti=['排名','播放时间(s)','播放时间','占比','艺术家']
+        ti3=[0.35,0.9,1,0.7,2]
+        if not 'p' in settings :
+            ti=ti[:3]+ti[4:]
+            ti3=ti3[:3]+ti3[4:]
         k=0
         for i in ti :
             t.write(0,k,i)
@@ -91,11 +94,18 @@ def main(filen:str,filen2:str,settings:dict) :
             t.write(k,0,tk)
             t.write(k,1,i['playtime'])
             t.write(k,2,getlengthstr(i['playtime']))
-            t.write(k,3,i['artist'])
+            if 'p' in settings :
+                t.write(k,3,xlwt.Formula('B%s/SUM(B2:B%s)'%(k+1,len(r)+1)),s)
+                t.write(k,4,i['artist'])
+            else :
+                t.write(k,3,i['artist'])
             k=k+1
         t:xlwt.Worksheet=w.add_sheet('专辑听歌时间')
-        ti=['排名','播放时间(s)','播放时间','专辑','专辑艺术家']
-        ti3=[0.35,0.9,1,3.6,2]
+        ti=['排名','播放时间(s)','播放时间','占比','专辑','专辑艺术家']
+        ti3=[0.35,0.9,1,0.7,3.6,2]
+        if not 'p' in settings :
+            ti=ti[:3]+ti[4:]
+            ti3=ti3[:3]+ti3[4:]
         k=0
         for i in ti :
             t.write(0,k,i)
@@ -114,12 +124,20 @@ def main(filen:str,filen2:str,settings:dict) :
             t.write(k,0,tk)
             t.write(k,1,i['playtime'])
             t.write(k,2,getlengthstr(i['playtime']))
-            t.write(k,3,i['album'])
-            t.write(k,4,i['albumartist'])
+            if 'p' in settings :
+                t.write(k,3,xlwt.Formula('B%s/SUM(B2:B%s)'%(k+1,len(r)+1)),s)
+                t.write(k,4,i['album'])
+                t.write(k,5,i['albumartist'])
+            else :
+                t.write(k,3,i['album'])
+                t.write(k,4,i['albumartist'])
             k=k+1
         t:xlwt.Worksheet=w.add_sheet('专辑-艺术家听歌时间')
-        ti=['排名','播放时间(s)','播放时间','艺术家','专辑','专辑艺术家']
-        ti3=[0.35,0.9,1,2,3.6,2]
+        ti=['排名','播放时间(s)','播放时间','占比','艺术家','专辑','专辑艺术家']
+        ti3=[0.35,0.9,1,0.7,2,3.6,2]
+        if not 'p' in settings :
+            ti=ti[:3]+ti[4:]
+            ti3=ti3[:3]+ti3[4:]
         k=0
         for i in ti :
             t.write(0,k,i)
@@ -138,17 +156,26 @@ def main(filen:str,filen2:str,settings:dict) :
             t.write(k,0,tk)
             t.write(k,1,i['playtime'])
             t.write(k,2,getlengthstr(i['playtime']))
-            t.write(k,3,i['artist'])
-            t.write(k,4,i['album'])
-            t.write(k,5,i['albumartist'])
+            if 'p' in settings :
+                t.write(k,3,xlwt.Formula('B%s/SUM(B2:B%s)'%(k+1,len(r)+1)),s)
+                t.write(k,4,i['artist'])
+                t.write(k,5,i['album'])
+                t.write(k,6,i['albumartist'])
+            else :
+                t.write(k,3,i['artist'])
+                t.write(k,4,i['album'])
+                t.write(k,5,i['albumartist'])
             k=k+1
         if 'hid' in settings :
             r=geteverydayplaytimelist(re,True)
         else :
             r=geteverydayplaytimelist(re)
         t:xlwt.Worksheet=w.add_sheet('每日听歌时间')
-        ti=['序号','日期','播放时间(s)','播放时间']
-        ti3=[0.35,1.5,0.9,1]
+        ti=['序号','日期','播放时间(s)','播放时间','占比']
+        ti3=[0.35,1.5,0.9,1,0.7]
+        if not 'p' in settings :
+            ti=ti[:-1]
+            ti3=ti3[:-1]
         k=0
         for i in ti :
             t.write(0,k,i)
@@ -161,6 +188,8 @@ def main(filen:str,filen2:str,settings:dict) :
             t.write(k,1,i['timestr'])
             t.write(k,2,i['playtime'])
             t.write(k,3,getlengthstr(i['playtime']))
+            if 'p' in settings :
+                t.write(k,4,xlwt.Formula('C%s/SUM(C2:C%s)'%(k+1,len(r['r'])+1)),s)
             k=k+1
         if 'hid' in settings :
             t:xlwt.Worksheet=w.add_sheet('每日听歌时间(详细记录)')
