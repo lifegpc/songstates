@@ -105,6 +105,31 @@ def main(filen:str,filen2:str,settings:dict) :
             t.write(k,3,i['album'])
             t.write(k,4,i['albumartist'])
             k=k+1
+        t:xlwt.Worksheet=w.add_sheet('专辑-艺术家听歌时间')
+        ti=['排名','播放时间(s)','播放时间','艺术家','专辑','专辑艺术家']
+        ti3=[0.35,0.9,1,2,3.6,2]
+        k=0
+        for i in ti :
+            t.write(0,k,i)
+            rr:xlwt.Column=t.col(k)
+            rr.width=int(rr.width*ti3[k])
+            k=k+1
+        r=getalbumartistplaytimelist(re)
+        sort(r,'playtime')
+        k=1
+        tt=0
+        tk=1
+        for i in r :
+            if i['playtime']!=tt :
+                tt=i['playtime']
+                tk=k
+            t.write(k,0,tk)
+            t.write(k,1,i['playtime'])
+            t.write(k,2,getlengthstr(i['playtime']))
+            t.write(k,3,i['artist'])
+            t.write(k,4,i['album'])
+            t.write(k,5,i['albumartist'])
+            k=k+1
         w.save(fn)
 def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
@@ -192,12 +217,31 @@ def getalbumplaytimelist(l:list) :
             k=k+1
         return -1
     for i in l :
-        if 'album' in i :
+        if 'album' in i and 'albumartist' in i :
             k=isin(i,r)
             if k >-1:
                 r[k]['playtime']=r[k]['playtime']+i['playtime']
             else :
                 r.append({'album':i['album'],'playtime':i['playtime'],'albumartist':i['albumartist']})
+    return r
+def getalbumartistplaytimelist(l:list):
+    "获取专辑-艺术家播放时间列表"
+    r=[]
+    def isin(d:dict,r:list) :
+        "判断d是否存在于r"
+        k=0
+        for i in r:
+            if d['album']==i['album'] and d['albumartist']==i['albumartist'] and d['artist']==i['artist'] :
+                return k
+            k=k+1
+        return -1
+    for i in l :
+        if 'album' in i and 'albumartist' in i and 'artist' in i :
+            k=isin(i,r)
+            if k >-1:
+                r[k]['playtime']=r[k]['playtime']+i['playtime']
+            else :
+                r.append({'album':i['album'],'playtime':i['playtime'],'albumartist':i['albumartist'],'artist':i['artist']})
     return r
 if __name__=="__main__" :
     if len(sys.argv)>1 :
