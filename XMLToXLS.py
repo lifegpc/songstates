@@ -16,20 +16,28 @@ def main(filen:str,filen2:str,settings:dict) :
     if os.path.exists(filen2) :
         os.remove(filen2)
     w=xlwt.Workbook()
-    a=w.add_sheet('Source Data')
+    a:xlwt.Worksheet=w.add_sheet('原数据')
+    ti2=['序号','标题','艺术家','轨道艺术家','专辑','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)','播放次数','上次播放','播放记录']
     t=['id','title','artist','trackartist','album','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds','playcount','lastplayed','playedtimes']
+    ti=[0.35,2.8,2,1,3.6,2,0.4,0.7,0.7,0.5,0.7,0.5,0.5,0.7,0.5,0.5,0.7,0.7,1.5,1]#宽度
     if 'h' in settings :
-        t2=['id','time']
-        b=w.add_sheet('History')
+        t2=['序号','播放时间']
+        ti3=[0.35,1.5]
+        b:xlwt.Worksheet=w.add_sheet('历史记录')
         j=0
         for i in t2 :
             b.write(0,j,i)
+            r:xlwt.Column=b.col(j)
+            r.width=int(r.width*ti3[j])
             j=j+1
         t=t[:-1]
+        ti2=ti2[:-1]
         k2=1
     j=0
-    for i in t :
+    for i in ti2 :
         a.write(0,j,i)
+        r:xlwt.Column=a.col(j)
+        r.width=int(r.width*ti[j])
         j=j+1
     j=1
     if 'h' in settings :

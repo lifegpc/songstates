@@ -31,11 +31,14 @@ def main(filen:str,filen2:str,settings:dict) :
         fn:str="%s\\all.xls"%(filen2)
         w=xlwt.Workbook(encoding='utf8')
         t:xlwt.Worksheet=w.add_sheet('每首歌听歌时间')
-        ti=['排名','播放时间(s)','播放时间','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度（秒）','上次播放']
+        ti=['排名','播放时间(s)','播放时间','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)','上次播放']
         ti2=['playcount','title','artist','album','trackartist','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds','lastplayed']
+        ti3=[0.35,0.9,0.9,0.7,2.8,2,3.6,1,2,0.4,0.7,0.7,0.5,0.7,0.5,0.5,0.7,0.5,0.5,0.7,1.5]#宽度
         k=0
         for i in ti:
             t.write(0,k,i)
+            rr:xlwt.Column=t.col(k)
+            rr.width=int(rr.width*ti3[k])
             k=k+1
         r=re
         sort(r,'playtime')
