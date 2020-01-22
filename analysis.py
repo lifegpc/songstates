@@ -7,13 +7,15 @@ import xlwt
 import dataqc
 import time
 h="""useage:
-\tanalysis.py [-h] <-a> [-q] [-hid] [-p] inputfile outputfile
+\tanalysis.py [-h] <-a> [-q] [-hid] [-hp] [-p] [-dp] inputfile outputfile
 choice:
 \t-h\t显示帮助
 \t-a\t分析所有时间的数据
 \t-q\t歌曲去重
-\t-hid\t分析每天播放时间时输出详细信息
+\t-hid\t分析每日听歌时间时输出详细信息
+\t-hp\t每日听歌时间按播放时间降序（详细信息不受此影响）
 \t-p\t计算播放时间百分比
+\t-dp\t发行年份听歌时间按播放时间降序
 inputfile:支持XML和JSON文件
 outputfile:输出文件夹名称
 """
@@ -170,6 +172,8 @@ def main(filen:str,filen2:str,settings:dict) :
             r=geteverydayplaytimelist(re,True)
         else :
             r=geteverydayplaytimelist(re)
+        if 'hp' in settings :
+            sort(r['r'],'playtime')
         t:xlwt.Worksheet=w.add_sheet('每日听歌时间')
         ti=['序号','日期','播放时间(s)','播放时间','占比']
         ti3=[0.35,1.5,0.9,1,0.7]
@@ -192,6 +196,8 @@ def main(filen:str,filen2:str,settings:dict) :
                 t.write(k,4,xlwt.Formula('C%s/SUM(C2:C%s)'%(k+1,len(r['r'])+1)),s)
             k=k+1
         if 'hid' in settings :
+            if 'hp' in settings :
+                sort(r['r'],'time',False)
             t:xlwt.Worksheet=w.add_sheet('每日听歌时间(详细记录)')
             ti=['序号','播放时间','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)']
             ti2=['playcount','title','artist','album','trackartist','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds']
@@ -213,7 +219,7 @@ def main(filen:str,filen2:str,settings:dict) :
                             t.write(k,n,re[j['i']][m])
                         n=n+1
                     k=k+1
-        t:xlwt.Worksheet=w.add_sheet('发行年份播放时间')
+        t:xlwt.Worksheet=w.add_sheet('发行年份听歌时间')
         ti=['序号','年份','播放时间(s)','播放时间','占比']
         ti3=[0.35,0.4,0.9,1,0.7]
         if not 'p' in settings :
@@ -226,7 +232,10 @@ def main(filen:str,filen2:str,settings:dict) :
             rr.width=int(rr.width*ti3[k])
             k=k+1
         r=getdateplaytimelist(re)
-        sort(r,'date',False)
+        if 'dp' in settings :
+            sort(r,'playtime')
+        else :
+            sort(r,'date',False)
         k=1
         for i in r :
             t.write(k,0,k)
@@ -254,6 +263,12 @@ def getchoice(settings:dict,i:str):
             return 2
         elif i=='-p' :
             settings['p']=True
+            return 2
+        elif i=='-hp' :
+            settings['hp']=True
+            return 2
+        elif i=='-dp' :
+            settings['dp']=True
             return 2
         else :
             return 1
