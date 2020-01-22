@@ -5,12 +5,14 @@ import json
 import time
 import xlwt
 import dataqc
+import time
 h="""useage:
-\tanalysis.py [-h] [-a] [-q] inputfile outputfile
+\tanalysis.py [-h] [-a] [-q] [-hid] inputfile outputfile
 choice:
 \t-h\t显示帮助
 \t-a\t分析所有时间的数据
 \t-q\t歌曲去重
+\t-hid\t分析每天播放时间时输出详细信息
 inputfile:支持XML和JSON文件
 outputfile:输出文件夹名称
 """
@@ -130,6 +132,48 @@ def main(filen:str,filen2:str,settings:dict) :
             t.write(k,4,i['album'])
             t.write(k,5,i['albumartist'])
             k=k+1
+        if 'hid' in settings :
+            r=geteverydayplaytimelist(re,True)
+        else :
+            r=geteverydayplaytimelist(re)
+        t:xlwt.Worksheet=w.add_sheet('每日听歌时间')
+        ti=['序号','日期','播放时间(s)','播放时间']
+        ti3=[0.35,1.5,0.9,1]
+        k=0
+        for i in ti :
+            t.write(0,k,i)
+            rr:xlwt.Column=t.col(k)
+            rr.width=int(rr.width*ti3[k])
+            k=k+1
+        k=1
+        for i in r['r'] :
+            t.write(k,0,k)
+            t.write(k,1,i['timestr'])
+            t.write(k,2,i['playtime'])
+            t.write(k,3,getlengthstr(i['playtime']))
+            k=k+1
+        if 'hid' in settings :
+            t:xlwt.Worksheet=w.add_sheet('每日听歌时间(详细记录)')
+            ti=['序号','播放时间','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)']
+            ti2=['playcount','title','artist','album','trackartist','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds']
+            ti3=[0.5,1.5,0.7,2.8,2,3.6,1,2,0.4,0.7,0.7,0.5,0.7,0.5,0.5,0.7,0.5,0.5,0.7]
+            k=0
+            for i in ti :
+                t.write(0,k,i)
+                rr:xlwt.Column=t.col(k)
+                rr.width=int(rr.width*ti3[k])
+                k=k+1
+            k=1
+            for i in r['r']:
+                for j in r['d'][i['timestr']]:
+                    t.write(k,0,k)
+                    t.write(k,1,j['ts'])
+                    n=2
+                    for m in ti2:
+                        if m in re[j['i']] :
+                            t.write(k,n,re[j['i']][m])
+                        n=n+1
+                    k=k+1
         w.save(fn)
 def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
@@ -137,8 +181,10 @@ def getchoice(settings:dict,i:str):
         if i=='-a' :
             settings['a']=True
             return 2
-        if i=='-q' :
+        elif i=='-q' :
             settings['q']=True
+        elif i=='-hid' :
+            settings['hid']=True
         else :
             return 1
     else:
@@ -243,6 +289,39 @@ def getalbumartistplaytimelist(l:list):
             else :
                 r.append({'album':i['album'],'playtime':i['playtime'],'albumartist':i['albumartist'],'artist':i['artist']})
     return r
+def geteverydayplaytimelist(l:list,s:bool=False) :
+    "获取每天的播放时间，s为True返回详细信息"
+    d={}
+    r=[]
+    def getstr(t:str):
+        return time.strftime('%Y-%m-%d',time.strptime(t,'%Y-%m-%d %H:%M:%S'))
+    def isin(t:str,r:list):
+        ts=getstr(t)
+        k=0
+        for i in r :
+            if i['timestr']==ts :
+                return k
+            k=k+1
+        return -1
+    m=0
+    for i in l :
+        if 'playedtimes' in i:
+            for j in i['playedtimes'] :
+                k=isin(j,r)
+                if k>-1 :
+                    r[k]['playtime']=r[k]['playtime']+i['lengthseconds']
+                    if s:
+                        d[getstr(j)].append({'i':m,'t':time.strptime(j,'%Y-%m-%d %H:%M:%S'),'ts':j})
+                else :
+                    r.append({'playtime':i['lengthseconds'],'time':time.strptime(getstr(j),'%Y-%m-%d'),'timestr':getstr(j)})
+                    if s:
+                        d[getstr(j)]=[{'i':m,'t':time.strptime(j,'%Y-%m-%d %H:%M:%S'),'ts':j}]
+        m=m+1
+    sort(r,'time',False)
+    if s:
+        for i in r:
+            sort(d[i['timestr']],'t',False)
+    return {'r':r,'d':d}
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""
