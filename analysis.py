@@ -26,10 +26,35 @@ def main(filen:str,filen2:str,settings:dict) :
     if os.path.exists(filen2) :
         removedir(filen2)
     os.mkdir(filen2)
+    getlength(re)
     if 'a' in settings:
         fn:str="%s\\all.xls"%(filen2)
         w=xlwt.Workbook(encoding='utf8')
         t:xlwt.Worksheet=w.add_sheet('每首歌听歌时间')
+        ti=['排名','播放时间(s)','播放时间','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度（秒）','上次播放']
+        ti2=['playcount','title','artist','album','trackartist','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds','lastplayed']
+        k=0
+        for i in ti:
+            t.write(0,k,i)
+            k=k+1
+        r=re
+        sort(r,'playtime')
+        k=1
+        tt=0
+        tk=1
+        for i in r :
+            if i['playtime']!=tt :
+                tt=i['playtime']
+                tk=k
+            t.write(k,0,tk)
+            t.write(k,1,i['playtime'])
+            t.write(k,2,getlengthstr(i['playtime']))
+            n=3
+            for j in ti2 :
+                if j in i :
+                    t.write(k,n,i[j])
+                n=n+1
+            k=k+1
         w.save(fn)
 def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
@@ -56,6 +81,36 @@ def removedir(f:str) :
         os.removedirs(f)
     except :
         pass
+def getlength(l:list) :
+    "获得每首歌的播放时间（秒）"
+    for i in l:
+        i['playtime']=i['lengthseconds']*i['playcount']
+def sort(l:list,k:str,p:bool=True):
+    "根据k的关键字排序,false升序,true降序"
+    m=1
+    while m<len(l) :
+        n=m
+        while n<len(l) :
+            if p and l[m-1][k]<l[n][k] :
+                t=l[m-1]
+                l[m-1]=l[n]
+                l[n]=t
+            if not p and l[m-1][k]>l[n][k] :
+                t=l[m-1]
+                l[m-1]=l[n]
+                l[n]=t
+            n=n+1
+        m=m+1
+def getlengthstr(i:int) :
+    "获取长度 day h m s"
+    if i>=(3600*24) :
+        return "%s天 %.2d:%.2d:%.2d"%(i//(3600*24),(i%(3600*24))//3600,(i%3600)//60,i%60)
+    elif i>=3600 :
+        return "%.2d:%.2d:%.2d"%(i//3600,(i%3600)//60,i%60)
+    elif i>=0 :
+        return "%.2d:%.2d"%(i//60,i%60)
+    else :
+        return ""
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""

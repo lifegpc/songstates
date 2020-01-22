@@ -65,15 +65,15 @@ class Hander(xml.sax.ContentHandler) :
         self.istag=0
     def characters(self,context) :
         if self.istag==1 :
-            self.sa['title']=context
+            self.getl('title',context)
         elif self.istag==2 :
-            self.sa['artist']=context
+            self.getl('artist',context)
         elif self.istag==3 :
-            self.sa['trackartist']=context
+            self.getl('trackartist',context)
         elif self.istag==4 :
-            self.sa['album']=context
+            self.getl('album',context)
         elif self.istag==5 :
-            self.sa['albumartist']=context
+            self.getl('albumartist',context)
         elif self.istag==6 :
             try :
                 self.sa['date']=int(context)
@@ -108,3 +108,8 @@ class Hander(xml.sax.ContentHandler) :
             self.sa['playedtimes']=json.loads(context)
     def endDocument(self) :
         pass
+    def getl(self,k:str,c:str):
+        if k in self.sa :
+            self.sa[k]=self.sa[k]+c
+        else :
+            self.sa[k]=c

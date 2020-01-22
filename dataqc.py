@@ -1,11 +1,17 @@
 def qc(l:list):
     m=1
     r=[]
+    k=False
     for i in l[:-1] :
+        k=False
         for j in l[m:]:
-            if not (isin(i) and isin(j) and iseq(i,j)) :
-                r.append(i)
-    r.append(l[len(l)])
+            if isin(i) and isin(j) and iseq(i,j) :
+                k=True
+                break
+        if not k :
+            r.append(i)
+        m=m+1
+    r.append(l[len(l)-1])
     return r
 def isin(d:dict) :
     "检查信息"
