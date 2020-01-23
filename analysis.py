@@ -7,13 +7,21 @@ import xlwt
 import dataqc
 import time
 h="""useage:
-\tanalysis.py [-h] [-a] [-y <year>|all] [-q] [-hid] [-hp] [-p] [-dp] <inputfile> <outputfile>
+\tanalysis.py [-h] [-a] [-y <year>|all] [-ya] [-m <year><month>|all]
+ [-ym] [-q] [-hid] [-hp] [-p] [-dp] <inputfile> <outputfile>
 choice:
 \t-h\t显示帮助
 \t-a\t分析所有时间的数据
 \t-y\t分析指定年份的数据
 \t\t可以输入多个年份，中间用","隔开
+\t\t例如：2019,2020,2021
 \t\t可以用"all"选择所有存在的年份
+\t-ya\t相当于"-y all"
+\t-m\t分析指定年月的数据
+\t\t可以输入多个年月，中间用","隔开
+\t\t例如：201902,201905,202001
+\t\t可以用"all"选择所有存在的年月
+\t-ma\t相当于"-m all"
 \t-q\t歌曲去重
 \t-hid\t分析每日听歌时间时输出详细信息
 \t-hp\t每日听歌时间按播放时间降序（详细信息不受此影响）
@@ -273,6 +281,28 @@ def getchoice(settings:dict,i:str):
             return 2
         elif i=='-y' :
             return 3
+        elif i=='-m' :
+            return 4
+        elif i=='-ya' :
+            if 'y' in settings :
+                if settings['y']!='all' :
+                    print('-y 选项出现混用all和年份')
+                    print(h)
+                    exit(-1)
+            else :
+                settings['y']='all'
+                settings['ok']=True
+            return 2
+        elif i=='-ma' :
+            if 'm' in settings :
+                if settings['m']!='all' :
+                    print('-m 选项出现混用all和年月')
+                    print(h)
+                    exit(-1)
+            else :
+                settings['m']='all'
+                settings['ok']=True
+            return 2
         else :
             return 1
     else:
@@ -428,15 +458,17 @@ def getdateplaytimelist(l:list) :
             else :
                 r.append({'date':i['date'],'playtime':i['playtime']})
     return r
-def getyear(s:str,settings:dict):
-    "获取year的参数"
-    def getc(s:str) -> list :
+def getyearormonth(s:str,settings:dict,b:str='y'):
+    "获取year或month的参数，y year,m month"
+    def getc(s:str,b:str='y') -> list :
         "获取年份参数"
         r=s.split(',')
         l=[]
         for i in r :
-            t=time.strptime(i,'%Y')
-            t=t[0]
+            if b=='y':
+                t=time.strptime(i,'%Y')
+            else :
+                t=time.strptime(i,'%Y%m')
             l.append(t)
         return l
     def merge(l:list,l2:list) -> list:
@@ -451,21 +483,21 @@ def getyear(s:str,settings:dict):
             if o:
                 r.append(i)
         return r
-    if 'y' in settings :
-        if settings['y']=='all' :
+    if b in settings :
+        if settings[b]=='all' :
             if s!='all' :
                 return -1
         else :
             if s=='all' :
                 return -1
             else :
-                c=getc(s)
-                settings['y']=merge(c,settings['y'])
+                c=getc(s,b)
+                settings[b]=merge(c,settings[b])
     else :
         if s=='all' :
-            settings['y']='all'
+            settings[b]='all'
         else :
-            settings['y']=getc(s)
+            settings[b]=getc(s,b)
     settings['ok']=True
     return 0
 if __name__=="__main__" :
@@ -480,9 +512,17 @@ if __name__=="__main__" :
                 print(h)
                 exit(0)
             if read==3 :
-                re=getyear(i,settings)
+                re=getyearormonth(i,settings)
                 if re==-1 :
                     print('-y 选项出现混用all和年份')
+                    print(h)
+                    exit(-1)
+                read=0
+                continue
+            elif read==4 :
+                re=getyearormonth(i,settings,'m')
+                if re==-1 :
+                    print('-m 选项出现混用all和年月')
                     print(h)
                     exit(-1)
                 read=0
@@ -510,7 +550,7 @@ if __name__=="__main__" :
             elif m==0 :
                 print('参数不足:缺少输入文件和输出文件夹参数')
             else :
-                print('-a -y选项至少需要有一个')
+                print('-a -y -m选项至少需要有一个')
             print(h)
             exit(-1)
     else :
