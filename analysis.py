@@ -7,10 +7,13 @@ import xlwt
 import dataqc
 import time
 h="""useage:
-\tanalysis.py [-h] <-a> [-q] [-hid] [-hp] [-p] [-dp] inputfile outputfile
+\tanalysis.py [-h] [-a] [-y <year>|all] [-q] [-hid] [-hp] [-p] [-dp] <inputfile> <outputfile>
 choice:
 \t-h\t显示帮助
 \t-a\t分析所有时间的数据
+\t-y\t分析指定年份的数据
+\t\t可以输入多个年份，中间用","隔开
+\t\t可以用"all"选择所有存在的年份
 \t-q\t歌曲去重
 \t-hid\t分析每日听歌时间时输出详细信息
 \t-hp\t每日听歌时间按播放时间降序（详细信息不受此影响）
@@ -250,8 +253,6 @@ def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
     if len(i)>=1 and i[0]=='-':
         if i=='-a' :
-            if 'ok' in settings :
-                return -1
             settings['a']=True
             settings['ok']=True
             return 2
@@ -270,6 +271,8 @@ def getchoice(settings:dict,i:str):
         elif i=='-dp' :
             settings['dp']=True
             return 2
+        elif i=='-y' :
+            return 3
         else :
             return 1
     else:
@@ -425,16 +428,65 @@ def getdateplaytimelist(l:list) :
             else :
                 r.append({'date':i['date'],'playtime':i['playtime']})
     return r
+def getyear(s:str,settings:dict):
+    "获取year的参数"
+    def getc(s:str) -> list :
+        "获取年份参数"
+        r=s.split(',')
+        l=[]
+        for i in r :
+            t=time.strptime(i,'%Y')
+            t=t[0]
+            l.append(t)
+        return l
+    def merge(l:list,l2:list) -> list:
+        "将两个列表去重合并"
+        r=[]
+        for i in l+l2 :
+            o=True
+            for j in r :
+                if i==j :
+                    o=False
+                    break
+            if o:
+                r.append(i)
+        return r
+    if 'y' in settings :
+        if settings['y']=='all' :
+            if s!='all' :
+                return -1
+        else :
+            if s=='all' :
+                return -1
+            else :
+                c=getc(s)
+                settings['y']=merge(c,settings['y'])
+    else :
+        if s=='all' :
+            settings['y']='all'
+        else :
+            settings['y']=getc(s)
+    settings['ok']=True
+    return 0
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""
         name2=""
         settings={}
         m=0
+        read=0
         for i in sys.argv[1:] :
             if i=='-h' :
                 print(h)
                 exit(0)
+            if read==3 :
+                re=getyear(i,settings)
+                if re==-1 :
+                    print('-y 选项出现混用all和年份')
+                    print(h)
+                    exit(-1)
+                read=0
+                continue
             read=getchoice(settings,i)
             if m==0 and read==0 :
                 if os.path.exists(i) and os.path.isfile(i) :
@@ -450,13 +502,15 @@ if __name__=="__main__" :
                 else :
                     print('"%s"文件已存在'%(i))
                     exit(-1)
-            elif read==-1 :
-                print('请检查选项')
-                exit(-1)
         if m==2 and 'ok' in settings :
             main(name,name2,settings)
         else :
-            print('参数不足')
+            if m==1:
+                print('参数不足:缺少输出文件夹参数')
+            elif m==0 :
+                print('参数不足:缺少输入文件和输出文件夹参数')
+            else :
+                print('-a -y选项至少需要有一个')
             print(h)
             exit(-1)
     else :
