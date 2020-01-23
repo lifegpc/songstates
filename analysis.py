@@ -257,6 +257,20 @@ def main(filen:str,filen2:str,settings:dict) :
                 t.write(k,4,xlwt.Formula('C%s/SUM(C2:C%s)'%(k+1,len(r)+1)),s)
             k=k+1
         w.save(fn)
+    if 'y' in settings and 'm' in settings and settings['y']=='all' and settings['m']=='all' :
+        temp=autogetyearormonth(re,True,True)
+        settings['y']=temp['y']
+        settings['m']=temp['m']
+    elif 'y' in settings and settings['y']=='all' :
+        temp=autogetyearormonth(re)
+        settings['y']=temp['y']
+    elif 'm' in settings and settings['m']=='all' :
+        temp=autogetyearormonth(re,False,True)
+        settings['m']=temp['m']
+    elif 'y' in settings :
+        sorttimestruct(settings['y'],False)
+    elif 'm' in settings :
+        sorttimestruct(settings['m'],False)
 def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
     if len(i)>=1 and i[0]=='-':
@@ -500,6 +514,42 @@ def getyearormonth(s:str,settings:dict,b:str='y'):
             settings[b]=getc(s,b)
     settings['ok']=True
     return 0
+def autogetyearormonth(l:list,y:bool=True,m:bool=False)->dict:
+    "获取所有时间段"
+    yr=[]
+    mr=[]
+    def getyear(s:str) -> time.struct_time:
+        return time.strptime(time.strftime('%Y',time.strptime(s,"%Y-%m-%d %H:%M:%S")),'%Y')
+    def getmonth(s:str) -> time.struct_time:
+        return time.strptime(time.strftime('%Y%m',time.strptime(s,'%Y-%m-%d %H:%M:%S')),'%Y%m')
+    def isin(t:time.struct_time,l:list) -> bool :
+        for i in l :
+            if i==t :
+                return False
+        return True
+    if y or m :
+        for i in l :
+            if 'playedtimes' in i :
+                for j in i['playedtimes'] :
+                    if y and isin(getyear(j),yr) :
+                        yr.append(getyear(j))
+                    if m and isin(getmonth(j),mr) :
+                        mr.append(getmonth(j))
+    if y :
+        sorttimestruct(yr,False)
+    if m :
+        sorttimestruct(mr,False)
+    return {'y':yr,'m':mr}
+def sorttimestruct(l:list,b:bool=True):
+    "对时间结构元组进行排序,True降序,False升序"
+    t=[]
+    for i in l:
+        t.append({'s':i,'t':time.mktime(i)})
+    sort(t,'t',b)
+    k=0
+    for i in t :
+        l[k]=i['s']
+        k=k+1
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""
