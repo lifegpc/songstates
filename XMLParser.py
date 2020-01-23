@@ -105,7 +105,17 @@ class Hander(xml.sax.ContentHandler) :
         elif self.istag==18 :
             self.sa['lastplayed']=context
         elif self.istag==19 :
-            self.sa['playedtimes']=json.loads(context)
+            if not 'playedtimes' in self.sa :
+                try :
+                    self.sa['playedtimes']=json.loads(context)
+                except :
+                    self.sa['playedtimes']=context
+            else :
+                self.getl('playedtimes',context)
+                try :
+                    self.sa['playedtimes']=json.loads(self.sa['playedtimes'])
+                except :
+                    pass
     def endDocument(self) :
         pass
     def getl(self,k:str,c:str):
