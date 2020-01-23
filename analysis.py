@@ -42,9 +42,7 @@ def main(filen:str,filen2:str,settings:dict) :
     if os.path.exists(filen2) :
         removedir(filen2)
     os.mkdir(filen2)
-    getlength(re)
-    if 'a' in settings:
-        fn:str="%s\\all.xls"%(filen2)
+    def writexls(fn:str,settings:dict,re:list):
         w=xlwt.Workbook(encoding='utf8')
         t:xlwt.Worksheet=w.add_sheet('每首歌听歌时间')
         ti=['排名','播放时间(s)','播放时间','占比','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)','上次播放']
@@ -257,6 +255,9 @@ def main(filen:str,filen2:str,settings:dict) :
                 t.write(k,4,xlwt.Formula('C%s/SUM(C2:C%s)'%(k+1,len(r)+1)),s)
             k=k+1
         w.save(fn)
+    getlength(re)
+    if 'a' in settings:
+        writexls("%s\\all.xls"%(filen2),settings,re)
     if 'y' in settings and 'm' in settings and settings['y']=='all' and settings['m']=='all' :
         temp=autogetyearormonth(re,True,True)
         settings['y']=temp['y']
@@ -271,6 +272,12 @@ def main(filen:str,filen2:str,settings:dict) :
         sorttimestruct(settings['y'],False)
     elif 'm' in settings :
         sorttimestruct(settings['m'],False)
+    if 'y' in settings :
+        for i in settings['y'] :
+            writexls('%s\\%s.xls'%(filen2,time.strftime('%Y',i)),settings,gettimelist(re,i))
+    if 'm' in settings :
+        for i in settings['m'] :
+            writexls('%s\\%s.xls'%(filen2,time.strftime('%Y%m',i)),settings,gettimelist(re,i,False,True))
 def getchoice(settings:dict,i:str):
     "解析是否为选项，不是选项返回0，是选项但解析失败返回1"
     if len(i)>=1 and i[0]=='-':
@@ -550,6 +557,33 @@ def sorttimestruct(l:list,b:bool=True):
     for i in t :
         l[k]=i['s']
         k=k+1
+def gettimelist(l:list,t:time.struct_time,y:bool=True,m:bool=False) -> list :
+    "根据时间结构元组获得相应时间内歌曲数据"
+    r=[]
+    def getyear(s:str) -> time.struct_time:
+        return time.strptime(time.strftime('%Y',time.strptime(s,"%Y-%m-%d %H:%M:%S")),'%Y')
+    def getmonth(s:str) -> time.struct_time:
+        return time.strptime(time.strftime('%Y%m',time.strptime(s,'%Y-%m-%d %H:%M:%S')),'%Y%m')
+    def getnewlist(l:list,t:time.struct_time,y:bool,m:bool) -> list :
+        r=[]
+        for i in l :
+            if y and getyear(i)==t :
+                r.append(i)
+            if m and getmonth(i)==t :
+                r.append(i)
+        return r
+    for i in l :
+        if 'playedtimes' in i :
+            te=i
+            te['playedtimes']=getnewlist(te['playedtimes'],t,y,m)
+            te['playcount']=len(te['playedtimes'])
+            if te['playcount'] ==0 :
+                te.pop('playedtimes')
+            r.append(te)
+        else :
+            r.append(i)
+    getlength(r)
+    return r
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""
