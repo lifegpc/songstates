@@ -24,6 +24,12 @@
 </playlist>
 ```
 [这里](https://kanahanazawa.com/tools/foobarxml/)是一个可以加上根节点的小工具。
+### 程序所需要的依赖库
+[python](https://www.python.org/)和第三方库[xlwt](https://pypi.org/project/xlwt/)   
+xlwt 可以使用 pip 下载安装
+```bash
+pip install --upgrade xlwt
+```
 ## 程序部分
 ### 转换部分
 #### XMLToJSON
@@ -41,4 +47,9 @@ python XMLToJSON.py out.xml out.json
 ```bash
 python XMLToJSON.py out.xml out.xls #简单转换
 python XMLToJSON.py -h out.xml out.xls #将歌曲历史播放记录写入"History"表，"-h"可以放在任一位置
+```
+### 分析部分
+使用下面的命令行可以查看使用方法：
+```bash
+python analysis.py -h
 ```
