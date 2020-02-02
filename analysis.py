@@ -574,7 +574,7 @@ def gettimelist(l:list,t:time.struct_time,y:bool=True,m:bool=False) -> list :
         return r
     for i in l :
         if 'playedtimes' in i :
-            te=i
+            te=getdictcopy(i)
             te['playedtimes']=getnewlist(te['playedtimes'],t,y,m)
             te['playcount']=len(te['playedtimes'])
             if te['playcount'] ==0 :
@@ -584,6 +584,26 @@ def gettimelist(l:list,t:time.struct_time,y:bool=True,m:bool=False) -> list :
             r.append(i)
     getlength(r)
     return r
+def getdictcopy(d:dict)-> dict :
+    re={}
+    for i in d.keys():
+        if type(d[i])==list :
+            re[i]=getlistcopy(d[i])
+        elif type(d[i])==dict :
+            re[i]=getdictcopy(d[i])
+        else :
+            re[i]=d[i]
+    return re
+def getlistcopy(l:list) -> list :
+    re=[]
+    for i in l:
+        if type(i)==list :
+            re.append(getlistcopy(i))
+        elif type(i)==dict :
+            re.append(getdictcopy(i))
+        else :
+            re.append(i)
+    return re
 if __name__=="__main__" :
     if len(sys.argv)>1 :
         name=""
