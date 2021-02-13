@@ -45,6 +45,9 @@ def main(filen:str,filen2:str,settings:dict) :
     def writexls(fn:str,settings:dict,re:list):
         w=xlwt.Workbook(encoding='utf8')
         t:xlwt.Worksheet=w.add_sheet('每首歌听歌时间')
+        t.set_panes_frozen('1')
+        t.set_vert_split_pos(1)
+        t.set_horz_split_pos(1)
         ti=['排名','播放时间(s)','播放时间','占比','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)','上次播放']
         ti2=['playcount','title','artist','album','trackartist','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds','lastplayed']
         ti3=[0.35,0.9,1,0.7,0.7,2.8,2,3.6,1,2,0.4,0.7,0.7,0.5,0.7,0.5,0.5,0.7,0.5,0.5,0.7,1.5]#宽度
@@ -82,6 +85,9 @@ def main(filen:str,filen2:str,settings:dict) :
                 n=n+1
             k=k+1
         t:xlwt.Worksheet=w.add_sheet('艺术家听歌时间')
+        t.set_panes_frozen('1')
+        t.set_vert_split_pos(1)
+        t.set_horz_split_pos(1)
         ti=['排名','播放时间(s)','播放时间','占比','艺术家']
         ti3=[0.35,0.9,1,0.7,2]
         if not 'p' in settings :
@@ -112,6 +118,9 @@ def main(filen:str,filen2:str,settings:dict) :
                 t.write(k,3,i['artist'])
             k=k+1
         t:xlwt.Worksheet=w.add_sheet('专辑听歌时间')
+        t.set_panes_frozen('1')
+        t.set_vert_split_pos(1)
+        t.set_horz_split_pos(1)
         ti=['排名','播放时间(s)','播放时间','占比','专辑','专辑艺术家']
         ti3=[0.35,0.9,1,0.7,3.6,2]
         if not 'p' in settings :
@@ -144,6 +153,9 @@ def main(filen:str,filen2:str,settings:dict) :
                 t.write(k,4,i['albumartist'])
             k=k+1
         t:xlwt.Worksheet=w.add_sheet('专辑-艺术家听歌时间')
+        t.set_panes_frozen('1')
+        t.set_vert_split_pos(1)
+        t.set_horz_split_pos(1)
         ti=['排名','播放时间(s)','播放时间','占比','艺术家','专辑','专辑艺术家']
         ti3=[0.35,0.9,1,0.7,2,3.6,2]
         if not 'p' in settings :
@@ -184,6 +196,9 @@ def main(filen:str,filen2:str,settings:dict) :
         if 'hp' in settings :
             sort(r['r'],'playtime')
         t:xlwt.Worksheet=w.add_sheet('每日听歌时间')
+        t.set_panes_frozen('1')
+        t.set_vert_split_pos(1)
+        t.set_horz_split_pos(1)
         ti=['序号','日期','播放时间(s)','播放时间','占比']
         ti3=[0.35,1.5,0.9,1,0.7]
         if not 'p' in settings :
@@ -208,6 +223,9 @@ def main(filen:str,filen2:str,settings:dict) :
             if 'hp' in settings :
                 sort(r['r'],'time',False)
             t:xlwt.Worksheet=w.add_sheet('每日听歌时间(详细记录)')
+            t.set_panes_frozen('1')
+            t.set_vert_split_pos(1)
+            t.set_horz_split_pos(1)
             ti=['序号','播放时间','播放次数','标题','艺术家','专辑','轨道艺术家','专辑艺术家','年份','光盘编号','轨道编号','编码','编码扩展','扩展名','比特率','采样频率','声道数','长度','长度(s)']
             ti2=['playcount','title','artist','album','trackartist','albumartist','date','discnumber','tracknumber','codec','codecprofile','ext','bitrate','samplerate','channels','length','lengthseconds']
             ti3=[0.5,1.5,0.7,2.8,2,3.6,1,2,0.4,0.7,0.7,0.5,0.7,0.5,0.5,0.7,0.5,0.5,0.7]
@@ -229,6 +247,9 @@ def main(filen:str,filen2:str,settings:dict) :
                         n=n+1
                     k=k+1
         t:xlwt.Worksheet=w.add_sheet('发行年份听歌时间')
+        t.set_panes_frozen('1')
+        t.set_vert_split_pos(1)
+        t.set_horz_split_pos(1)
         ti=['序号','年份','播放时间(s)','播放时间','占比']
         ti3=[0.35,0.4,0.9,1,0.7]
         if not 'p' in settings :
